@@ -1,7 +1,19 @@
 version: '3.9'
 
 services:
-  user_service_db:
+
+  user-service:
+    build: .
+    ports:
+      - "${APP_PORT}:80"
+    depends_on:
+      user-service-db:
+        condition: service_healthy
+    networks:
+      - user-service-net
+    restart: unless-stopped
+
+  user-service-db:
     image: postgres
     restart: always
     environment:
@@ -9,7 +21,7 @@ services:
       POSTGRES_USER: ${USER_SERVICE_DATABASE_USER}
       POSTGRES_DB: ${USER_SERVICE_DATABASE_DB}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -17,6 +29,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - user-service-net
+
+networks:
+  user-service-net:
+    driver: bridge
 
 volumes:
   postgres-data:
