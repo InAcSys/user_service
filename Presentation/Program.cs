@@ -1,36 +1,33 @@
 using DotNetEnv;
+using UserService.Presentation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load("../.env");
 
+builder.WebHost.ConfigureKestrel(options => {
+    options.ListenAnyIP(80);
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddConfiguration();
 builder.Services.AddControllers();
 
-builder.Services.AddCors(
-    options =>
-    {
-        options.AddPolicy("AllowLocalhost", policy =>
-        {
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-        });
-    }
-);
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowLocalhost", policy => {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseAuthorization();
-
 app.UseCors("AllowLocalhost");
-
 app.MapControllers();
 app.Run();
-

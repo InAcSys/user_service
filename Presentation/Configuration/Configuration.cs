@@ -15,10 +15,10 @@ namespace UserService.Presentation.Configuration
                 throw new ArgumentException("Connection not found");
             }
 
-            services.AddDbContext<DbContext, UserServiceDbContext>(
+            services.AddDbContext<UserServiceDbContext>(
                 options => options.UseNpgsql(
                     connection,
-                    b => b.MigrationsAssembly(Assembly.GetExecutingAssembly())
+                    b => b.MigrationsAssembly(typeof(UserServiceDbContext).Assembly.FullName)
                 )
             );
 
