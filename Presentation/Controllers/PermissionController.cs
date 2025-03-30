@@ -25,13 +25,13 @@ namespace UserService.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreatePermissionDTO permission)
+        public async Task<IActionResult> Create([FromBody] PermissionDTO permission)
         {
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdatePermissionDTO permission)
+        public async Task<IActionResult> Update(int id, [FromBody] PermissionDTO permission)
         {
             return Ok();
         }

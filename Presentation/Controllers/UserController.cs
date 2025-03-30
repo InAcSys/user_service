@@ -31,13 +31,13 @@ namespace UserService.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateUserDTO user)
+        public async Task<IActionResult> Create([FromBody] UserDTO user)
         {
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserDTO user)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UserDTO user)
         {
             return Ok();
         }

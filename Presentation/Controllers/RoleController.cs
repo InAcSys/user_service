@@ -25,13 +25,13 @@ namespace UserService.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateRoleDTO role)
+        public async Task<IActionResult> Create([FromBody] RoleDTO role)
         {
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateRoleDTO role)
+        public async Task<IActionResult> Update(int id, [FromBody] RoleDTO role)
         {
             return Ok();
         }
