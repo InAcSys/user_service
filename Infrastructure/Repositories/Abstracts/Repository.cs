@@ -54,14 +54,18 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             return entity;
         }
 
-        public async virtual Task<T> Update(T entity)
+        public async virtual Task<T> Update(TKey id, T entity)
         {
-            var entry = _dbContext.Entry(entity);
-            if (entry.State == EntityState.Detached)
+            if (EqualityComparer<TKey>.Default.Equals(id, default))
             {
-                _dbContext.Set<T>().Attach(entity);
+                throw new ArgumentNullException(nameof(id));
             }
-            entry.State = EntityState.Modified;
+            var existingEntity = await _dbContext.Set<T>().FindAsync(id);
+            if (existingEntity is null)
+            {
+                throw new InvalidOperationException("The entity to update was not found.");
+            }
+            _dbContext.Entry(existingEntity).CurrentValues.SetValues(entity);
             await _dbContext.SaveChangesAsync();
             return entity;
         }

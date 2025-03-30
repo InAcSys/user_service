@@ -1,6 +1,8 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using UserService.Application.Services.Concretes;
 using UserService.Application.Services.Interfaces;
+using UserService.Application.Validators;
 using UserService.Domain.DTOs.Permission;
 using UserService.Domain.DTOs.Role;
 using UserService.Infrastructure.Context;
@@ -31,6 +33,9 @@ namespace UserService.Presentation.Configuration
             services.AddScoped<IRepository<PermissionDTO, int>, PermissionRepository>();
             services.AddScoped<IService<RoleDTO, int>, RoleService>();
             services.AddScoped<IRepository<RoleDTO, int>, RoleRepository>();
+
+            services.AddValidatorsFromAssemblyContaining<PermissionValidator>();
+            services.AddValidatorsFromAssemblyContaining<RoleValidator>();
 
             return services;
         }

@@ -1,45 +1,86 @@
 using Microsoft.AspNetCore.Mvc;
+using UserService.Application.Services.Interfaces;
 using UserService.Domain.DTOs.Permission;
 
 namespace UserService.Presentation.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class PermissionController : ControllerBase
+    public class PermissionController
+    (
+        IService<PermissionDTO, int> service
+    ) : ControllerBase
     {
+        protected readonly IService<PermissionDTO, int> _service = service;
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok("Get all ok :D");
+            var result = await _service.GetAll();
+            return Ok(result);
         }
 
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            return Ok();
+            var result = await _service.GetById(id);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetAllByName(string name)
+        public async Task<IActionResult> GetByName(string name)
         {
-            return Ok();
+            var result = await _service.GetByName(name);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PermissionDTO permission)
         {
-            return Ok();
+            if (permission is null)
+            {
+                return BadRequest();
+            }
+
+            var result = await _service.Create(permission);
+            if (result is null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] PermissionDTO permission)
         {
-            return Ok();
+            if (permission is null)
+            {
+                return BadRequest();
+            }
+
+            var result = await _service.Update(id, permission);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return Ok();
+            var result = await _service.Delete(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
         }
     }
 }

@@ -61,14 +61,22 @@ namespace UserService.Application.Services.Abstracts
             return entity;
         }
 
-        public Task<T> Update(T entity)
+        public Task<T> Update(TKey id, T entity)
         {
+            if (EqualityComparer<TKey>.Default.Equals(id, default))
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+            if (entity is null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
             var result = _validator.Validate(entity);
             if (!result.IsValid)
             {
                 throw new ValidationException(result.Errors);
             }
-            var updatedEntity = _repository.Update(entity);
+            var updatedEntity = _repository.Update(id, entity);
             return updatedEntity;
         }
     }
