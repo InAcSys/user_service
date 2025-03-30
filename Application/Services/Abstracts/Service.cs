@@ -1,15 +1,19 @@
 using FluentValidation;
 using UserService.Application.Services.Interfaces;
+using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Application.Services.Abstracts
 {
     public class Service<T, TKey>
     (
-        IValidator<T> validator
+        IValidator<T> validator,
+        IRepository<T, TKey> repository
     ) : IService<T, TKey>
     {
 
         protected readonly IValidator<T> _validator = validator;
+        protected readonly IRepository<T, TKey> _repository = repository;
+
         public Task<T> Create(T entity)
         {
             var result = _validator.Validate(entity);
@@ -17,7 +21,8 @@ namespace UserService.Application.Services.Abstracts
             {
                 throw new ValidationException(result.Errors);
             }
-            return Task.FromResult(entity);
+            var createdEntity = _repository.Create(entity);
+            return createdEntity;
         }
 
         public Task<bool> Delete(TKey id)
@@ -26,12 +31,14 @@ namespace UserService.Application.Services.Abstracts
             {
                 throw new ArgumentNullException(nameof(id));
             }
-            return Task.FromResult(true);
+            var result = _repository.Delete(id);
+            return result;
         }
 
         public Task<IEnumerable<T>> GetAll()
         {
-            throw new NotImplementedException();
+            var entities = _repository.GetAll();
+            return entities;
         }
 
         public Task<T?> GetById(TKey id)
@@ -40,7 +47,8 @@ namespace UserService.Application.Services.Abstracts
             {
                 throw new ArgumentNullException(nameof(id));
             }
-            return Task.FromResult<T?>(default);
+            var entity = _repository.GetById(id);
+            return entity;
         }
 
         public Task<T?> GetByName(string name)
@@ -49,7 +57,8 @@ namespace UserService.Application.Services.Abstracts
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            return Task.FromResult<T?>(default);
+            var entity = _repository.GetByName(name);
+            return entity;
         }
 
         public Task<T> Update(T entity)
@@ -59,7 +68,8 @@ namespace UserService.Application.Services.Abstracts
             {
                 throw new ValidationException(result.Errors);
             }
-            return Task.FromResult(entity);
+            var updatedEntity = _repository.Update(entity);
+            return updatedEntity;
         }
     }
 }

@@ -1,6 +1,11 @@
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using UserService.Application.Services.Concretes;
+using UserService.Application.Services.Interfaces;
+using UserService.Domain.DTOs.Permission;
+using UserService.Domain.DTOs.Role;
 using UserService.Infrastructure.Context;
+using UserService.Infrastructure.Repositories.Concretes;
+using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Presentation.Configuration
 {
@@ -21,6 +26,11 @@ namespace UserService.Presentation.Configuration
                     b => b.MigrationsAssembly(typeof(UserServiceDbContext).Assembly.FullName)
                 )
             );
+
+            services.AddScoped<IService<PermissionDTO, int>, PermissionService>();
+            services.AddScoped<IRepository<PermissionDTO, int>, PermissionRepository>();
+            services.AddScoped<IService<RoleDTO, int>, RoleService>();
+            services.AddScoped<IRepository<RoleDTO, int>, RoleRepository>();
 
             return services;
         }
