@@ -1,16 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Services.Interfaces;
 using UserService.Domain.DTOs.Permission;
+using UserService.Domain.Entities.Concretes;
 
 namespace UserService.Presentation.Controllers
 {
     [ApiController, Route("api/[controller]")]
     public class PermissionController
     (
-        IService<PermissionDTO, int> service
+        IService<Permission, int> service
     ) : ControllerBase
     {
-        protected readonly IService<PermissionDTO, int> _service = service;
+        protected readonly IService<Permission, int> _service = service;
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -48,7 +49,13 @@ namespace UserService.Presentation.Controllers
                 return BadRequest();
             }
 
-            var result = await _service.Create(permission);
+            var currentPermission = new Permission
+            {
+                Name = permission.Name,
+                Description = permission.Description
+            };
+
+            var result = await _service.Create(currentPermission);
             if (result is null)
             {
                 return BadRequest();
@@ -64,7 +71,13 @@ namespace UserService.Presentation.Controllers
                 return BadRequest();
             }
 
-            var result = await _service.Update(id, permission);
+            var currentPermission = new Permission
+            {
+                Name = permission.Name,
+                Description = permission.Description
+            };
+
+            var result = await _service.Update(id, currentPermission);
             if (result is null)
             {
                 return NotFound();

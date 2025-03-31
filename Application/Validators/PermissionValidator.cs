@@ -1,9 +1,9 @@
 using FluentValidation;
-using UserService.Domain.DTOs.Permission;
+using UserService.Domain.Entities.Concretes;
 
 namespace UserService.Application.Validators
 {
-    public class PermissionValidator : AbstractValidator<PermissionDTO>
+    public class PermissionValidator : AbstractValidator<Permission>
     {
         public PermissionValidator()
         {

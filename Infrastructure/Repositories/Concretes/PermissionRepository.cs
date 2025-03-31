@@ -1,12 +1,12 @@
-using UserService.Domain.DTOs.Permission;
-using UserService.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
+using UserService.Domain.Entities.Concretes;
 using UserService.Infrastructure.Repositories.Abstracts;
 
 namespace UserService.Infrastructure.Repositories.Concretes
 {
-    public class PermissionRepository : Repository<PermissionDTO, int>
+    public class PermissionRepository : Repository<Permission, int>
     {
-        public PermissionRepository(UserServiceDbContext context) : base(context)
+        public PermissionRepository(DbContext context) : base(context)
         {
         }
     }

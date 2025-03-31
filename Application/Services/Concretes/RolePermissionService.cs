@@ -5,9 +5,9 @@ using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Application.Services.Concretes
 {
-    public class RoleService : Service<Role, int>
+    public class RolePermissionService : Service<RolePermission, int>
     {
-        public RoleService(IValidator<Role> validator, IRepository<Role, int> repository) : base(validator, repository)
+        public RolePermissionService(IValidator<RolePermission> validator, IRepository<RolePermission, int> repository) : base(validator, repository)
         {
         }
     }

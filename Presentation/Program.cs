@@ -11,6 +11,7 @@ builder.WebHost.ConfigureKestrel(options => {
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddConfiguration();
 builder.Services.AddControllers();
 
@@ -27,6 +28,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseCors("AllowLocalhost");
 app.MapControllers();

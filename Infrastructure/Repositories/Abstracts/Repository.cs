@@ -4,12 +4,16 @@ using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Infrastructure.Repositories.Abstracts
 {
-    public class Repository<T, TKey>(UserServiceDbContext dbContext) : IRepository<T, TKey> where T : class
+    public class Repository<T, TKey>(DbContext dbContext) : IRepository<T, TKey> where T : class
     {
-        protected readonly UserServiceDbContext _dbContext = dbContext;
+        protected readonly DbContext _dbContext = dbContext;
 
         public async virtual Task<T> Create(T entity)
         {
+            Console.WriteLine("==============================================================");
+            Console.WriteLine("YA LLEGO :D");
+            Console.WriteLine(_dbContext.Database.GetDbConnection().ConnectionString);
+            Console.WriteLine("==============================================================");
             await _dbContext.Set<T>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return entity;

@@ -14,7 +14,7 @@ namespace UserService.Application.Services.Abstracts
         protected readonly IValidator<T> _validator = validator;
         protected readonly IRepository<T, TKey> _repository = repository;
 
-        public Task<T> Create(T entity)
+        public virtual Task<T> Create(T entity)
         {
             var result = _validator.Validate(entity);
             if (!result.IsValid)
@@ -25,7 +25,7 @@ namespace UserService.Application.Services.Abstracts
             return createdEntity;
         }
 
-        public Task<bool> Delete(TKey id)
+        public virtual Task<bool> Delete(TKey id)
         {
             if (EqualityComparer<TKey>.Default.Equals(id, default))
             {
@@ -35,13 +35,13 @@ namespace UserService.Application.Services.Abstracts
             return result;
         }
 
-        public Task<IEnumerable<T>> GetAll()
+        public virtual Task<IEnumerable<T>> GetAll()
         {
             var entities = _repository.GetAll();
             return entities;
         }
 
-        public Task<T?> GetById(TKey id)
+        public virtual Task<T?> GetById(TKey id)
         {
             if (EqualityComparer<TKey>.Default.Equals(id, default))
             {
@@ -51,7 +51,7 @@ namespace UserService.Application.Services.Abstracts
             return entity;
         }
 
-        public Task<T?> GetByName(string name)
+        public virtual Task<T?> GetByName(string name)
         {
             if (name is null)
             {
@@ -61,7 +61,7 @@ namespace UserService.Application.Services.Abstracts
             return entity;
         }
 
-        public Task<T> Update(TKey id, T entity)
+        public virtual Task<T> Update(TKey id, T entity)
         {
             if (EqualityComparer<TKey>.Default.Equals(id, default))
             {

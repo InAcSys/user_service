@@ -1,10 +1,11 @@
+using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+
 using UserService.Application.Services.Concretes;
 using UserService.Application.Services.Interfaces;
 using UserService.Application.Validators;
-using UserService.Domain.DTOs.Permission;
-using UserService.Domain.DTOs.Role;
+using UserService.Domain.Entities.Concretes;
 using UserService.Infrastructure.Context;
 using UserService.Infrastructure.Repositories.Concretes;
 using UserService.Infrastructure.Repositories.Interfaces;
@@ -22,20 +23,28 @@ namespace UserService.Presentation.Configuration
                 throw new ArgumentException("Connection not found");
             }
 
-            services.AddDbContext<UserServiceDbContext>(
+            Console.WriteLine("==============================================================");
+            Console.WriteLine("Connection String:");
+            Console.WriteLine(connection);
+            Console.WriteLine("==============================================================");
+
+            services.AddDbContext<DbContext, UserServiceDbContext>(
                 options => options.UseNpgsql(
                     connection,
-                    b => b.MigrationsAssembly(typeof(UserServiceDbContext).Assembly.FullName)
+                    b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)
                 )
             );
 
-            services.AddScoped<IService<PermissionDTO, int>, PermissionService>();
-            services.AddScoped<IRepository<PermissionDTO, int>, PermissionRepository>();
-            services.AddScoped<IService<RoleDTO, int>, RoleService>();
-            services.AddScoped<IRepository<RoleDTO, int>, RoleRepository>();
+            services.AddScoped<IService<Permission, int>, PermissionService>();
+            services.AddScoped<IRepository<Permission, int>, PermissionRepository>();
+            services.AddScoped<IService<Role, int>, RoleService>();
+            services.AddScoped<IRepository<Role, int>, RoleRepository>();
+            services.AddScoped<IService<RolePermission, int>, RolePermissionService>();
+            services.AddScoped<IRepository<RolePermission, int>, RolePermissionRepository>();
 
             services.AddValidatorsFromAssemblyContaining<PermissionValidator>();
             services.AddValidatorsFromAssemblyContaining<RoleValidator>();
+            services.AddValidatorsFromAssemblyContaining<RolePermissionValidator>();
 
             return services;
         }

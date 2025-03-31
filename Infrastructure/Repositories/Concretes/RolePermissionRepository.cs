@@ -4,9 +4,9 @@ using UserService.Infrastructure.Repositories.Abstracts;
 
 namespace UserService.Infrastructure.Repositories.Concretes
 {
-    public class RoleRepository : Repository<Role, int>
+    public class RolePermissionRepository : Repository<RolePermission, int>
     {
-        public RoleRepository(DbContext context) : base(context)
+        public RolePermissionRepository(DbContext dbContext) : base(dbContext)
         {
         }
     }
