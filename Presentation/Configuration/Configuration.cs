@@ -23,11 +23,6 @@ namespace UserService.Presentation.Configuration
                 throw new ArgumentException("Connection not found");
             }
 
-            Console.WriteLine("==============================================================");
-            Console.WriteLine("Connection String:");
-            Console.WriteLine(connection);
-            Console.WriteLine("==============================================================");
-
             services.AddDbContext<DbContext, UserServiceDbContext>(
                 options => options.UseNpgsql(
                     connection,

@@ -10,10 +10,6 @@ namespace UserService.Infrastructure.Repositories.Abstracts
 
         public async virtual Task<T> Create(T entity)
         {
-            Console.WriteLine("==============================================================");
-            Console.WriteLine("YA LLEGO :D");
-            Console.WriteLine(_dbContext.Database.GetDbConnection().ConnectionString);
-            Console.WriteLine("==============================================================");
             await _dbContext.Set<T>().AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return entity;

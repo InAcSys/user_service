@@ -54,37 +54,50 @@ namespace UserService.Presentation.Controllers
             {
                 return BadRequest();
             }
+
             var existingRole = await _service.GetByName(role.Name);
             if (existingRole is not null)
             {
-                return BadRequest("Role already exists");
+                return Conflict();
             }
-            var newRole = new Role
+
+            var createRole = new Role { Name = role.Name };
+            var result = await _service.Create(createRole);
+            if (result is null)
             {
-                Name = role.Name
-            };
-            var createdRole = await _service.Create(newRole);
-            if (createdRole is null)
+                return BadRequest("Error al crear el rol.");
+            }
+            if (!role.PermissionIds.Any())
             {
                 return BadRequest();
             }
-            // foreach (var permissionId in role.PermissionIds)
-            // {
-            //     var rolePermission = new RolePermission
-            //     {
-            //         RoleId = createdRole.Id,
-            //         PermissionId = permissionId
-            //     };
-            //     await _rolePermissionService.Create(rolePermission);
-            // }
+            var rolePermissions = role.PermissionIds.Select(permissionId => new RolePermission
+            {
+                RoleId = result.Id,
+                PermissionId = permissionId
+            }).ToList();
+
+            foreach (var rolePermission in rolePermissions)
+            {
+                await _rolePermissionService.Create(rolePermission);
+            }
+
+            var createdRole = await _service.GetById(result.Id);
+            if (createdRole is null)
+            {
+                return BadRequest("Error al recuperar el rol creado.");
+            }
+
             var createdRoleDTO = new CreateRoleDTO
             {
                 Id = createdRole.Id,
                 Name = createdRole.Name,
-                PermissionIds = role.PermissionIds
+                PermissionIds = createdRole.RolePermissions.Select(rp => rp.PermissionId).ToList()
             };
+
             return CreatedAtAction(nameof(GetById), new { id = createdRole.Id }, createdRoleDTO);
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] RoleDTO role)
