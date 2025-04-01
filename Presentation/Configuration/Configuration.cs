@@ -36,10 +36,13 @@ namespace UserService.Presentation.Configuration
             services.AddScoped<IRepository<Role, int>, RoleRepository>();
             services.AddScoped<IService<RolePermission, int>, RolePermissionService>();
             services.AddScoped<IRepository<RolePermission, int>, RolePermissionRepository>();
+            services.AddScoped<IService<User, Guid>, UserSystemService>();
+            services.AddScoped<IRepository<User, Guid>, UserRepository>();
 
             services.AddValidatorsFromAssemblyContaining<PermissionValidator>();
             services.AddValidatorsFromAssemblyContaining<RoleValidator>();
             services.AddValidatorsFromAssemblyContaining<RolePermissionValidator>();
+            services.AddValidatorsFromAssemblyContaining<UserValidator>();
 
             return services;
         }
