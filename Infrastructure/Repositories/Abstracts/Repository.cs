@@ -28,9 +28,25 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             return true;
         }
 
-        public async virtual Task<IEnumerable<T>> GetAll()
+        public async virtual Task<IEnumerable<T>> GetAll(int pageNumber, int pageSize)
         {
-            var entities = await _dbContext.Set<T>().ToListAsync();
+            if (pageNumber < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than or equal to 1.");
+            }
+            if (pageSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
+            }
+
+            var skip = (pageNumber - 1) * pageSize;
+            var take = pageSize;
+
+            var entities = await _dbContext.Set<T>()
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
             return entities;
         }
 

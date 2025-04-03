@@ -549,4 +549,6 @@ obj/
 
 .env
 
+*.session.sql
+
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore,aspnetcore,csharp,visualstudiocode

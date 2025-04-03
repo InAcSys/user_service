@@ -13,9 +13,17 @@ namespace UserService.Presentation.Controllers
     {
         protected readonly IService<Permission, int> _service = service;
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            var result = await _service.GetAll();
+            if (pageNumber < 1)
+            {
+                return BadRequest("Page number must be greater than or equal to 1.");
+            }
+            if (pageSize < 1)
+            {
+                return BadRequest("Page size must be greater than or equal to 1.");
+            }
+            var result = await _service.GetAll(pageNumber, pageSize);
             return Ok(result);
         }
 

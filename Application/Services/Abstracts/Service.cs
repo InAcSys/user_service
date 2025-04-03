@@ -35,9 +35,9 @@ namespace UserService.Application.Services.Abstracts
             return result;
         }
 
-        public virtual Task<IEnumerable<T>> GetAll()
+        public virtual Task<IEnumerable<T>> GetAll(int pageNumber, int pageSize)
         {
-            var entities = _repository.GetAll();
+            var entities = _repository.GetAll(pageNumber, pageSize);
             return entities;
         }
 

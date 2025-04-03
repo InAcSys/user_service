@@ -15,13 +15,17 @@ namespace UserService.Presentation.Controllers
         protected readonly IService<RolePermission, int> _rolePermissionService = rolePermissionService;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            var result = await _service.GetAll();
-            if (!result.Any())
+            if (pageNumber < 1)
             {
-                return NotFound();
+                return BadRequest("Page number must be greater than or equal to 1.");
             }
+            if (pageSize < 1)
+            {
+                return BadRequest("Page size must be greater than or equal to 1.");
+            }
+            var result = await _service.GetAll(pageNumber, pageSize);
             return Ok(result);
         }
 
@@ -120,7 +124,7 @@ namespace UserService.Presentation.Controllers
             {
                 return BadRequest();
             }
-            var existingRolePermissions = await _rolePermissionService.GetAll();
+            var existingRolePermissions = await _rolePermissionService.GetAll(1, 100);
             foreach (var permissionId in role.PermissionIds)
             {
                 var existingRolePermission = existingRolePermissions.FirstOrDefault(rp => rp.RoleId == id && rp.PermissionId == permissionId);
