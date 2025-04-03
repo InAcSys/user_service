@@ -4,7 +4,8 @@ WORKDIR /src
 
 # Copiar archivos de proyecto necesarios
 COPY ["Presentation/Presentation.csproj", "Presentation/"]
-COPY ["Logic/Logic.csproj", "Logic/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+COPY ["Application/Application.csproj", "Application/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["UserService.sln", "."]
 
