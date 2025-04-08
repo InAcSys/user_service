@@ -10,13 +10,13 @@ namespace UserService.Application.Validators
             RuleFor(permission => permission.Name)
                 .NotEmpty()
                 .WithMessage("Permission name is required.")
-                .Length(3, 50)
-                .WithMessage("Permission name must be between 3 and 50 characters.");
+                .Length(3, 100)
+                .WithMessage("Permission name must be between 3 and 100 characters.");
             RuleFor(permission => permission.Description)
                 .NotEmpty()
                 .WithMessage("Permission description is required.")
-                .Length(10, 200)
-                .WithMessage("Permission description must be between 10 and 200 characters.");
+                .Length(10, 255)
+                .WithMessage("Permission description must be between 10 and 255 characters.");
         }
     }
 }

@@ -10,18 +10,18 @@ namespace UserService.Application.Validators
             RuleFor(user => user.FirstNames)
                 .NotEmpty()
                 .WithMessage("First names are required.")
-                .Length(2, 200)
-                .WithMessage("First names must be between 2 and 200 characters.");
+                .Length(2, 255)
+                .WithMessage("First names must be between 2 and 255 characters.");
             RuleFor(user => user.LastNames)
                 .NotEmpty()
                 .WithMessage("Last names are required.")
-                .Length(2, 200)
-                .WithMessage("Last names must be between 2 and 200 characters.");
+                .Length(2, 255)
+                .WithMessage("Last names must be between 2 and 255 characters.");
             RuleFor(user => user.ShortName)
                 .NotEmpty()
                 .WithMessage("Short name is required.")
-                .Length(2, 50)
-                .WithMessage("Short name must be between 2 and 50 characters.");
+                .Length(2, 100)
+                .WithMessage("Short name must be between 2 and 100 characters.");
             RuleFor(user => user.Code)
                 .NotEmpty()
                 .WithMessage("Code is required.")
@@ -30,8 +30,8 @@ namespace UserService.Application.Validators
             RuleFor(user => user.Address)
                 .NotEmpty()
                 .WithMessage("Address is required.")
-                .Length(2, 200)
-                .WithMessage("Address must be between 2 and 200 characters.");
+                .Length(2, 255)
+                .WithMessage("Address must be between 2 and 255 characters.");
             RuleFor(user => user.PhoneNumber)
                 .NotEmpty()
                 .WithMessage("Phone number is required.")
