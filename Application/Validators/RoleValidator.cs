@@ -10,8 +10,8 @@ namespace UserService.Application.Validators
             RuleFor(role => role.Name)
                 .NotEmpty()
                 .WithMessage("Role name is required.")
-                .Length(3, 50)
-                .WithMessage("Role name must be between 3 and 50 characters.");
+                .Length(3, 100)
+                .WithMessage("Role name must be between 3 and 100 characters.");
         }
     }
 }

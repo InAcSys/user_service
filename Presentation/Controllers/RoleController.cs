@@ -96,7 +96,7 @@ namespace UserService.Presentation.Controllers
             {
                 Id = createdRole.Id,
                 Name = createdRole.Name,
-                PermissionIds = createdRole.RolePermissions.Select(rp => rp.PermissionId).ToList()
+                PermissionIds = role.PermissionIds.Select(rp => rp).ToList()
             };
 
             return CreatedAtAction(nameof(GetById), new { id = createdRole.Id }, createdRoleDTO);
@@ -149,7 +149,7 @@ namespace UserService.Presentation.Controllers
             {
                 Id = existingRole.Id,
                 Name = existingRole.Name,
-                PermissionIds = existingRole.RolePermissions.Select(rp => rp.PermissionId).ToList()
+                PermissionIds = role.PermissionIds.Select(rp => rp).ToList()
             };
             return CreatedAtAction(nameof(GetById), new { id = existingRole.Id }, updatedRoleDTO);
         }
