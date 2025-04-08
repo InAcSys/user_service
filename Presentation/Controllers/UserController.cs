@@ -74,11 +74,16 @@ namespace UserService.Presentation.Controllers
                 LastNames = user.LastNames,
                 ShortName = user.ShortName,
                 Code = user.Code,
+                CI = user.CI,
+                CIType = user.CIType,
+                ImageUrl = user.ImageUrl,
                 Address = user.Address,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Password = user.Password,
-                Role = currentRole
+                Gender = user.Gender,
+                BirthDate = user.BirthDate,
+                RoleId = user.Role
             };
 
             var createdUser = await _service.Create(currentUser);
@@ -106,11 +111,17 @@ namespace UserService.Presentation.Controllers
                 LastNames = user.LastNames,
                 ShortName = user.ShortName,
                 Code = user.Code,
+                LMSId = user.LMSId,
+                CI = user.CI,
+                CIType = user.CIType,
+                ImageUrl = user.ImageUrl,
                 Address = user.Address,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Password = user.Password,
-                Role = currentRole
+                Gender = user.Gender,
+                BirthDate = user.BirthDate,
+                RoleId = user.Role
             };
 
             var updatedUser = await _service.Update(id, currentUser);
