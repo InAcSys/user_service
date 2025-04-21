@@ -23,7 +23,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalhost", policy =>
+    options.AddPolicy("AllowAnyOrigin", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
@@ -38,6 +38,6 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowAnyOrigin");
 app.MapControllers();
 app.Run();

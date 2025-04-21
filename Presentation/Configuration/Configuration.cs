@@ -38,11 +38,14 @@ namespace UserService.Presentation.Configuration
             services.AddScoped<IRepository<RolePermission, int>, RolePermissionRepository>();
             services.AddScoped<IService<User, Guid>, UserSystemService>();
             services.AddScoped<IRepository<User, Guid>, UserRepository>();
+            services.AddScoped<IUserService, UserSystemService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddValidatorsFromAssemblyContaining<PermissionValidator>();
             services.AddValidatorsFromAssemblyContaining<RoleValidator>();
             services.AddValidatorsFromAssemblyContaining<RolePermissionValidator>();
             services.AddValidatorsFromAssemblyContaining<UserValidator>();
+            services.AddValidatorsFromAssemblyContaining<CredentialsValidator>();
 
             return services;
         }

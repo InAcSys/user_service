@@ -2,16 +2,13 @@ services:
   user-service:
     build: .
     env_file: .env
-    extra_hosts:
-      - "localhost:host-gateway"
     ports:
       - "${USER_SERVICE_APP_PORT}:80"
     depends_on:
       - user-service-db
     networks:
       - user-service-net
-    restart: unless-stopped
-
+      - backend-net
 
   user-service-db:
     image: postgres
@@ -33,3 +30,5 @@ volumes:
 
 networks:
   user-service-net:
+  backend-net:
+    external: true
