@@ -39,6 +39,7 @@ CREATE TABLE
         "Gender" CHAR NOT NULL,
         "BirthDate" DATE NOT NULL,
         "RoleId" INT NOT NULL,
+        "Salt" BYTEA NOT NULL,
         "IsActive" BOOLEAN NOT NULL DEFAULT TRUE,
         "Created" TIMESTAMP NOT NULL DEFAULT NOW (),
         "Updated" TIMESTAMP,

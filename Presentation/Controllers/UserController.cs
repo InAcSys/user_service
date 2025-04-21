@@ -8,12 +8,12 @@ namespace UserService.Presentation.Controllers
     [ApiController, Route("api/[controller]")]
     public class UserController
     (
-        IService<User, Guid> service,
+        IUserService service,
         IService<Role, int> roleService
     ) : ControllerBase
     {
 
-        protected readonly IService<User, Guid> _service = service;
+        protected readonly IUserService _service = service;
         protected readonly IService<Role, int> _roleService = roleService;
 
         [HttpGet]
@@ -42,10 +42,32 @@ namespace UserService.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("email/{email}")]
+        public async Task<IActionResult> GetByEmail(string email)
+        {
+            var result = await _service.GetByEmail(email);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetAllByName(string name)
         {
             var result = await _service.GetByName(name);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+
+        [HttpPost("credentials")]
+        public async Task<IActionResult> ValidateCredentials([FromBody] CredentialDTO credential)
+        {
+            var result = await _service.ValidateCredentials(credential);
             if (result is null)
             {
                 return NotFound();

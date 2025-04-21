@@ -18,5 +18,6 @@ namespace UserService.Domain.Entities.Concretes
         public char Gender { get; set; } = 'M';
         public DateOnly BirthDate { get; set; }
         public int RoleId { get; set; }
+        public byte[] Salt { get; set; } = [];
     }
 }
