@@ -67,12 +67,23 @@ namespace UserService.Presentation.Controllers
         [HttpPost("credentials")]
         public async Task<IActionResult> ValidateCredentials([FromBody] CredentialDTO credential)
         {
-            var result = await _service.ValidateCredentials(credential);
-            if (result is null)
+            try
             {
-                return NotFound();
+                var result = await _service.ValidateCredentials(credential);
+                if (result is null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
             }
-            return Ok(result);
+            catch (InvalidDataException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
+            }
         }
 
         [HttpPost]

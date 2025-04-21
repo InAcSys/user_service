@@ -23,7 +23,7 @@ namespace UserService.Infrastructure.Repositories.Abstracts
 
             var password = HashPassword.PasswordGenerator(user.Salt, credential.Password);
 
-            if (!user.Email.Equals(credential.Email) && !user.Password.Equals(password))
+            if (!user.Email.Equals(credential.Email) || !user.Password.Equals(password))
             {
                 throw new InvalidDataException("Invalid credentials");
             }
