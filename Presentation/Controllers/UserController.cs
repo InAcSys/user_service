@@ -8,13 +8,11 @@ namespace UserService.Presentation.Controllers
     [ApiController, Route("api/[controller]")]
     public class UserController
     (
-        IUserService service,
-        IService<Role, int> roleService
+        IUserService service
     ) : ControllerBase
     {
 
         protected readonly IUserService _service = service;
-        protected readonly IService<Role, int> _roleService = roleService;
 
         [HttpGet]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
@@ -94,13 +92,6 @@ namespace UserService.Presentation.Controllers
                 return BadRequest();
             }
 
-            var currentRole = await _roleService.GetById(user.Role);
-
-            if (currentRole is null)
-            {
-                return NotFound();
-            }
-
             var currentUser = new User
             {
                 FirstNames = user.FirstNames,
@@ -129,13 +120,6 @@ namespace UserService.Presentation.Controllers
             if (user is null)
             {
                 return BadRequest();
-            }
-
-            var currentRole = await _roleService.GetById(user.Role);
-
-            if (currentRole is null)
-            {
-                return NotFound();
             }
 
             var currentUser = new User
