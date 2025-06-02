@@ -1,14 +1,16 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-
 using UserService.Application.Services.Concretes;
 using UserService.Application.Services.Interfaces;
 using UserService.Application.Validators;
+using UserService.Application.Validators.Concretes;
+using UserService.Application.Validators.Interfaces;
 using UserService.Domain.Entities.Concretes;
 using UserService.Infrastructure.Context;
 using UserService.Infrastructure.Repositories.Concretes;
 using UserService.Infrastructure.Repositories.Interfaces;
+using UserService.Presentation.Profiles;
 
 namespace UserService.Presentation.Configuration
 {
@@ -16,15 +18,17 @@ namespace UserService.Presentation.Configuration
     {
         public static IServiceCollection AddConfiguration(this IServiceCollection services)
         {
-            var connection = Environment.GetEnvironmentVariable("USER_SERVICE_DATABASE_STRING_CONNECTION");
+            var connection = Environment.GetEnvironmentVariable(
+                "USER_SERVICE_DATABASE_STRING_CONNECTION"
+            );
 
             if (string.IsNullOrEmpty(connection))
             {
                 throw new ArgumentException("Connection not found");
             }
 
-            services.AddDbContext<DbContext, UserServiceDbContext>(
-                options => options.UseNpgsql(
+            services.AddDbContext<DbContext, UserServiceDbContext>(options =>
+                options.UseNpgsql(
                     connection,
                     b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name)
                 )
@@ -35,8 +39,11 @@ namespace UserService.Presentation.Configuration
             services.AddScoped<IUserService, UserSystemService>();
             services.AddScoped<IUserRepository, UserRepository>();
 
-            services.AddValidatorsFromAssemblyContaining<UserValidator>();
+            services.AddScoped<ICreateValidator<User>, CreateUserValidator>();
+            services.AddScoped<IUpdateValidator<User>, UpdateUserValidator>();
             services.AddValidatorsFromAssemblyContaining<CredentialsValidator>();
+
+            services.AddAutoMapper(typeof(UserProfile));
 
             return services;
         }

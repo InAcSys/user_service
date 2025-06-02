@@ -1,11 +1,13 @@
 using FluentValidation;
+using UserService.Application.Validators.Interfaces;
+using UserService.Domain.DTOs.User;
 using UserService.Domain.Entities.Concretes;
 
-namespace UserService.Application.Validators
+namespace UserService.Application.Validators.Concretes
 {
-    public class UserValidator : AbstractValidator<User>
+    public class CreateUserValidator : AbstractValidator<User>, ICreateUserValidator
     {
-        public UserValidator()
+        public CreateUserValidator()
         {
             RuleFor(user => user.FirstNames)
                 .NotEmpty()
@@ -22,21 +24,12 @@ namespace UserService.Application.Validators
                 .WithMessage("Short name is required.")
                 .Length(2, 100)
                 .WithMessage("Short name must be between 2 and 100 characters.");
-            RuleFor(user => user.Code)
-                .NotEmpty()
-                .WithMessage("Code is required.")
-                .MinimumLength(2)
-                .WithMessage("Code must be at least 2 characters long.");
-            RuleFor(user => user.Address)
-                .NotEmpty()
-                .WithMessage("Address is required.")
-                .Length(2, 255)
-                .WithMessage("Address must be between 2 and 255 characters.");
-            RuleFor(user => user.PhoneNumber)
-                .NotEmpty()
-                .WithMessage("Phone number is required.")
-                .Matches(@"^\+?[0-9]{10,15}$")
-                .WithMessage("Phone number must be a valid format.");
+            // RuleFor(user => user.Address)
+            //     .Length(2, 255)
+            //     .WithMessage("Address must be between 2 and 255 characters.");
+            // RuleFor(user => user.PhoneNumber)
+            //     .Matches(@"^\+?[0-9]{10,15}$")
+            //     .WithMessage("Phone number must be a valid format.");
             RuleFor(user => user.Email)
                 .NotEmpty()
                 .WithMessage("Email is required.")
@@ -48,17 +41,19 @@ namespace UserService.Application.Validators
                 .MinimumLength(6)
                 .WithMessage("Password must be at least 6 characters long.")
                 .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$")
-                .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+                .WithMessage(
+                    "Password must contain at least one uppercase letter, one lowercase letter, and one number."
+                );
             RuleFor(user => user.CI)
                 .NotEmpty()
                 .WithMessage("CI is required.")
                 .Length(2, 50)
                 .WithMessage("CI must be between 2 and 50 characters.");
-            RuleFor(user => user.ImageUrl)
-                .NotEmpty()
-                .WithMessage("Image URL is required.")
-                .Matches(@"^(http|https)://[^\s]+$")
-                .WithMessage("Image URL must be a valid URL.");
+            // RuleFor(user => user.ImageUrl)
+            //     .NotEmpty()
+            //     .WithMessage("Image URL is required.")
+            //     .Matches(@"^(http|https)://[^\s]+$")
+            //     .WithMessage("Image URL must be a valid URL.");
         }
     }
 }
