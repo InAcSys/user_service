@@ -4,13 +4,13 @@ CREATE TABLE
         "FirstNames" VARCHAR(255) NOT NULL,
         "LastNames" VARCHAR(255) NOT NULL,
         "ShortName" VARCHAR(100) NOT NULL,
-        "Code" VARCHAR(100) NOT NULL UNIQUE,
-        "LMSId" INT NOT NULL UNIQUE,
+        "Code" VARCHAR(100) NULL,
+        "LMSId" INT NULL ,
         "CI" VARCHAR(20) NOT NULL UNIQUE,
         "CIType" VARCHAR(20) NOT NULL,
-        "ImageUrl" VARCHAR(255),
-        "Address" VARCHAR(255) NOT NULL,
-        "PhoneNumber" VARCHAR(50) NOT NULL,
+        "ImageUrl" VARCHAR(255) NULL,
+        "Address" VARCHAR(255) NULL,
+        "PhoneNumber" VARCHAR(50) NULL,
         "Email" VARCHAR(255) NOT NULL UNIQUE,
         "Password" VARCHAR(255) NOT NULL,
         "Gender" CHAR NOT NULL,
@@ -21,6 +21,5 @@ CREATE TABLE
         "Created" TIMESTAMP NOT NULL DEFAULT NOW (),
         "Updated" TIMESTAMP,
         "Deleted" TIMESTAMP,
-        "TenantId" UUID NOT NULL DEFAULT gen_random_uuid ()
+        "TenantId" UUID NOT NULL
     );
-    

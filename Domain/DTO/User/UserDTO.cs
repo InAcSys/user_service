@@ -16,6 +16,6 @@ namespace UserService.Domain.DTOs.User
         public string Password { get; set; } = "";
         public char Gender { get; set; } = 'M';
         public DateOnly BirthDate { get; set; }
-        public int Role { get; set; }
+        public int RoleId { get; set; }
     }
 }

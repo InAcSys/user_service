@@ -1,43 +1,56 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Services.Interfaces;
+using UserService.Domain.DTOs.Responses;
 using UserService.Domain.DTOs.User;
 using UserService.Domain.Entities.Concretes;
+using UserService.Presentation.Responses.Concretes;
 
 namespace UserService.Presentation.Controllers
 {
     [ApiController, Route("api/[controller]")]
-    public class UserController
-    (
-        IUserService service
-    ) : ControllerBase
+    public class UserController(IUserService service, IMapper mapper) : ControllerBase
     {
-
         protected readonly IUserService _service = service;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] Guid tenantId = default
+        )
         {
-            if (pageNumber < 1)
+            if (pageNumber < 1 || pageSize < 1)
             {
-                return BadRequest("Page number must be greater than or equal to 1.");
+                var error = new ErrorResponse(
+                    400,
+                    "Page number and size must be greater than 0.",
+                    null
+                );
+                return StatusCode(error.StatusCode, error);
             }
-            if (pageSize < 1)
-            {
-                return BadRequest("Page size must be greater than or equal to 1.");
-            }
-            var result = await _service.GetAll(pageNumber, pageSize);
-            return Ok(result);
+
+            var result = await _service.GetAll(pageNumber, pageSize, tenantId);
+            var size = await _service.Count(tenantId);
+
+            var response = new SuccessResponse<PaginatedResponseDTO<User>>(
+                200,
+                "Users retrieved successfully.",
+                new PaginatedResponseDTO<User>(result.ToList(), size, pageNumber, pageSize)
+            );
+
+            return StatusCode(response.StatusCode, response);
         }
 
         [HttpGet("id/{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id, [FromQuery] Guid tenantId)
         {
-            var result = await _service.GetById(id);
+            var result = await _service.GetById(id, tenantId);
             if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
+                return StatusCode(404, new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<User>(200, "User found", result));
         }
 
         [HttpGet("email/{email}")]
@@ -45,21 +58,9 @@ namespace UserService.Presentation.Controllers
         {
             var result = await _service.GetByEmail(email);
             if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }
+                return StatusCode(404, new ErrorResponse(404, "User not found", null));
 
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetAllByName(string name)
-        {
-            var result = await _service.GetByName(name);
-            if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
+            return Ok(new SuccessResponse<User>(200, "User found", result));
         }
 
         [HttpPost("credentials")]
@@ -69,10 +70,9 @@ namespace UserService.Presentation.Controllers
             {
                 var result = await _service.ValidateCredentials(credential);
                 if (result is null)
-                {
-                    return NotFound();
-                }
-                return Ok(result);
+                    return Unauthorized(new { message = "Invalid credentials." });
+
+                return Ok(new SuccessResponse<UserLogInDTO>(200, "Login successful", result));
             }
             catch (InvalidDataException ex)
             {
@@ -80,80 +80,91 @@ namespace UserService.Presentation.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
+                return StatusCode(
+                    500,
+                    new { message = "An unexpected error occurred", details = ex.Message }
+                );
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] UserDTO user)
+        public async Task<IActionResult> Create(
+            [FromQuery] Guid tenantId,
+            [FromBody] CreateUserDTO user
+        )
         {
             if (user is null)
-            {
                 return BadRequest();
-            }
 
-            var currentUser = new User
-            {
-                FirstNames = user.FirstNames,
-                LastNames = user.LastNames,
-                ShortName = user.ShortName,
-                Code = user.Code,
-                CI = user.CI,
-                CIType = user.CIType,
-                ImageUrl = user.ImageUrl,
-                Address = user.Address,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                Password = user.Password,
-                Gender = user.Gender,
-                BirthDate = user.BirthDate,
-                RoleId = user.Role
-            };
+            var currentUser = _mapper.Map<User>(user);
+            currentUser.TenantId = tenantId;
 
             var createdUser = await _service.Create(currentUser);
-            return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdUser.Id, tenantId = tenantId },
+                new SuccessResponse<User>(201, "User created", createdUser)
+            );
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UserDTO user)
+        public async Task<IActionResult> Update(
+            Guid id,
+            [FromBody] UpdateUserDTO user,
+            [FromQuery] Guid tenantId
+        )
         {
             if (user is null)
-            {
                 return BadRequest();
-            }
 
-            var currentUser = new User
-            {
-                FirstNames = user.FirstNames,
-                LastNames = user.LastNames,
-                ShortName = user.ShortName,
-                Code = user.Code,
-                LMSId = user.LMSId,
-                CI = user.CI,
-                CIType = user.CIType,
-                ImageUrl = user.ImageUrl,
-                Address = user.Address,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                Password = user.Password,
-                Gender = user.Gender,
-                BirthDate = user.BirthDate,
-                RoleId = user.Role
-            };
+            var currentUser = _mapper.Map<User>(user);
+            var updatedUser = await _service.Update(id, currentUser, tenantId);
 
-            var updatedUser = await _service.Update(id, currentUser);
-            return Ok(updatedUser);
+            if (updatedUser is null)
+                return NotFound(new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<User>(200, "User updated successfully", updatedUser));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid tenantId)
         {
-            var result = await _service.Delete(id);
+            var result = await _service.Delete(id, tenantId);
             if (!result)
+                return NotFound(new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<bool>(200, "User deleted successfully", result));
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] Guid tenantId = default,
+            [FromQuery] string search = ""
+        )
+        {
+            if (pageNumber < 1 || pageSize < 1)
             {
-                return BadRequest();
+                var error = new ErrorResponse(
+                    400,
+                    "Page number and size must be greater than 0.",
+                    null
+                );
+                return StatusCode(error.StatusCode, error);
             }
-            return Ok();
+
+            var result = await _service.Search(pageNumber, pageSize, tenantId, search);
+            var size = await _service.CountSearchResults(search, tenantId);
+
+            var response = new SuccessResponse<PaginatedResponseDTO<User>>(
+                200,
+                "Search completed successfully.",
+                new PaginatedResponseDTO<User>(result.ToList(), size, pageNumber, pageSize)
+            );
+
+            return Ok(response);
         }
     }
 }

@@ -1,20 +1,22 @@
 using FluentValidation;
 using UserService.Application.Services.Interfaces;
+using UserService.Application.Validators.Interfaces;
 using UserService.Domain.DTOs.User;
 using UserService.Domain.Entities.Concretes;
 using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Application.Services.Abstracts
 {
-    public abstract class UserAbstractService : Service<User, Guid>, IUserService
+    public abstract class UserAbstractService(
+        ICreateValidator<User> createValidator,
+        IUpdateValidator<User> updateValidator,
+        IValidator<CredentialDTO> credentialsValidator,
+        IUserRepository userRepository,
+        IRepository<User, Guid> repository
+    ) : Service<User, Guid>(createValidator, updateValidator, repository), IUserService
     {
-        protected readonly IUserRepository _userRepository;
-        protected readonly IValidator<CredentialDTO> _credentialValidator;
-        protected UserAbstractService(IValidator<User> validator, IValidator<CredentialDTO> credentialsValidator, IUserRepository userRepository, IRepository<User, Guid> repository) : base(validator, repository)
-        {
-            _userRepository = userRepository;
-            _credentialValidator = credentialsValidator;
-        }
+        protected readonly IUserRepository _userRepository = userRepository;
+        protected readonly IValidator<CredentialDTO> _credentialValidator = credentialsValidator;
 
         public async Task<UserLogInDTO> ValidateCredentials(CredentialDTO credential)
         {
@@ -35,6 +37,26 @@ namespace UserService.Application.Services.Abstracts
             }
             var user = _userRepository.GetByEmail(email);
             return user;
+        }
+
+        public Task<int> Count(Guid tenantId)
+        {
+            return _userRepository.Count(tenantId);
+        }
+
+        public async Task<IEnumerable<User>> Search(
+            int pageNumber,
+            int pageSize,
+            Guid tenantId,
+            string search
+        )
+        {
+            return await _userRepository.Search(pageNumber, pageSize, tenantId, search);
+        }
+
+        public Task<int> CountSearchResults(string search, Guid tenantId)
+        {
+            return _userRepository.CountSearchResults(search, tenantId);
         }
     }
 }

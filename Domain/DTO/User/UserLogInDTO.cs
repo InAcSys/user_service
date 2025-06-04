@@ -4,5 +4,6 @@ namespace UserService.Domain.DTOs.User
     {
         public Guid UserId { get; set; }
         public int RoleId { get; set; }
+        public Guid TenantId { get; set; }
     }
 }

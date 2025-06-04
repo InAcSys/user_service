@@ -1,4 +1,5 @@
 using UserService.Domain.Entities.Abstracts;
+
 namespace UserService.Domain.Entities.Concretes
 {
     public class User : Entity<Guid>
