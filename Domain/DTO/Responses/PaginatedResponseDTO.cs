@@ -1,6 +1,11 @@
 namespace UserService.Domain.DTOs.Responses
 {
-    public class PaginatedResponseDTO<T>(List<T> values, int totalItems, int pageNumber, int pageSize)
+    public class PaginatedResponseDTO<T>(
+        List<T> values,
+        int totalItems,
+        int pageNumber,
+        int pageSize
+    )
     {
         public int PageNumber { get; set; } = pageNumber;
         public int PageSize { get; set; } = pageSize;

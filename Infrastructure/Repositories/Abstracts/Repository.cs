@@ -4,18 +4,19 @@ using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Infrastructure.Repositories.Abstracts
 {
-    public class Repository<T, TKey>(DbContext dbContext) : IRepository<T, TKey> where T : Entity<TKey>
+    public class Repository<T, TKey>(DbContext dbContext) : IRepository<T, TKey>
+        where T : Entity<TKey>
     {
         protected readonly DbContext _context = dbContext;
 
-        public async virtual Task<T> Create(T entity)
+        public virtual async Task<T> Create(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
 
-        public async virtual Task<bool> Delete(TKey id, Guid tenantId)
+        public virtual async Task<bool> Delete(TKey id, Guid tenantId)
         {
             var entity = await GetById(id, tenantId);
             if (entity is null)
@@ -28,16 +29,26 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             return result is not null;
         }
 
-        public virtual async Task<IEnumerable<T>> GetAll(int pageNumber, int pageSize, Guid tenantId)
+        public virtual async Task<IEnumerable<T>> GetAll(
+            int pageNumber,
+            int pageSize,
+            Guid tenantId
+        )
         {
             if (pageNumber < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than or equal to 1.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageNumber),
+                    "Page number must be greater than or equal to 1."
+                );
             }
 
             if (pageSize < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageSize),
+                    "Page size must be greater than or equal to 1."
+                );
             }
 
             var skip = (pageNumber - 1) * pageSize;
@@ -49,10 +60,7 @@ namespace UserService.Infrastructure.Repositories.Abstracts
                 query = query.Where(x => x.TenantId == tenantId || x.TenantId == Guid.Empty);
             }
 
-            var entities = await query
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync();
+            var entities = await query.Skip(skip).Take(pageSize).ToListAsync();
 
             return entities;
         }
@@ -67,8 +75,9 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             var entity = await _context
                 .Set<T>()
                 .FirstOrDefaultAsync(r =>
-                    Equals(r.Id, id) &&
-                    (Equals(r.TenantId, tenantId) || Equals(r.TenantId, Guid.Empty)));
+                    Equals(r.Id, id)
+                    && (Equals(r.TenantId, tenantId) || Equals(r.TenantId, Guid.Empty))
+                );
 
             if (entity is null)
             {
@@ -78,17 +87,7 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             return entity;
         }
 
-        public async virtual Task<T?> GetByName(string name, Guid tenantId)
-        {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            var entity = await _context.Set<T>().FirstOrDefaultAsync(e => EF.Property<string>(e, "Name") == name && e.TenantId == tenantId);
-            return entity;
-        }
-
-        public async virtual Task<T> Update(TKey id, T entity, Guid tenantId)
+        public virtual async Task<T> Update(TKey id, T entity, Guid tenantId)
         {
             if (EqualityComparer<TKey>.Default.Equals(id, default))
             {

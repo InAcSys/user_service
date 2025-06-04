@@ -1,6 +1,5 @@
 using FluentValidation;
 using UserService.Application.Validators.Interfaces;
-using UserService.Domain.DTOs.User;
 using UserService.Domain.Entities.Concretes;
 
 namespace UserService.Application.Validators.Concretes

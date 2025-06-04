@@ -21,43 +21,36 @@ namespace UserService.Presentation.Controllers
             [FromQuery] Guid tenantId = default
         )
         {
-            if (pageNumber < 1)
+            if (pageNumber < 1 || pageSize < 1)
             {
                 var error = new ErrorResponse(
                     400,
-                    "Page number must be greater than or equal to 1.",
+                    "Page number and size must be greater than 0.",
                     null
                 );
                 return StatusCode(error.StatusCode, error);
             }
-            if (pageSize < 1)
-            {
-                var error = new ErrorResponse(
-                    400,
-                    "Page number must be greater than or equal to 1.",
-                    null
-                );
-                return StatusCode(error.StatusCode, error);
-            }
+
             var result = await _service.GetAll(pageNumber, pageSize, tenantId);
             var size = await _service.Count(tenantId);
+
             var response = new SuccessResponse<PaginatedResponseDTO<User>>(
                 200,
-                "",
+                "Users retrieved successfully.",
                 new PaginatedResponseDTO<User>(result.ToList(), size, pageNumber, pageSize)
             );
+
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpGet("id/{id}")]
-        public async Task<IActionResult> GetById(Guid id, Guid tenantId)
+        public async Task<IActionResult> GetById(Guid id, [FromQuery] Guid tenantId)
         {
             var result = await _service.GetById(id, tenantId);
             if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
+                return StatusCode(404, new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<User>(200, "User found", result));
         }
 
         [HttpGet("email/{email}")]
@@ -65,21 +58,9 @@ namespace UserService.Presentation.Controllers
         {
             var result = await _service.GetByEmail(email);
             if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }
+                return StatusCode(404, new ErrorResponse(404, "User not found", null));
 
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetAllByName(string name, Guid tenantId)
-        {
-            var result = await _service.GetByName(name, tenantId);
-            if (result is null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
+            return Ok(new SuccessResponse<User>(200, "User found", result));
         }
 
         [HttpPost("credentials")]
@@ -89,10 +70,9 @@ namespace UserService.Presentation.Controllers
             {
                 var result = await _service.ValidateCredentials(credential);
                 if (result is null)
-                {
-                    return NotFound();
-                }
-                return Ok(result);
+                    return Unauthorized(new { message = "Invalid credentials." });
+
+                return Ok(new SuccessResponse<UserLogInDTO>(200, "Login successful", result));
             }
             catch (InvalidDataException ex)
             {
@@ -114,44 +94,47 @@ namespace UserService.Presentation.Controllers
         )
         {
             if (user is null)
-            {
                 return BadRequest();
-            }
 
             var currentUser = _mapper.Map<User>(user);
             currentUser.TenantId = tenantId;
 
             var createdUser = await _service.Create(currentUser);
-            return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdUser.Id, tenantId = tenantId },
+                new SuccessResponse<User>(201, "User created", createdUser)
+            );
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(
             Guid id,
             [FromBody] UpdateUserDTO user,
-            Guid tenantId
+            [FromQuery] Guid tenantId
         )
         {
             if (user is null)
-            {
                 return BadRequest();
-            }
 
             var currentUser = _mapper.Map<User>(user);
-
             var updatedUser = await _service.Update(id, currentUser, tenantId);
-            return Ok(updatedUser);
+
+            if (updatedUser is null)
+                return NotFound(new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<User>(200, "User updated successfully", updatedUser));
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id, Guid tenantId)
+        public async Task<IActionResult> Delete(Guid id, [FromQuery] Guid tenantId)
         {
             var result = await _service.Delete(id, tenantId);
             if (!result)
-            {
-                return BadRequest();
-            }
-            return Ok();
+                return NotFound(new ErrorResponse(404, "User not found", null));
+
+            return Ok(new SuccessResponse<bool>(200, "User deleted successfully", result));
         }
 
         [HttpGet("search")]
@@ -162,20 +145,11 @@ namespace UserService.Presentation.Controllers
             [FromQuery] string search = ""
         )
         {
-            if (pageNumber < 1)
+            if (pageNumber < 1 || pageSize < 1)
             {
                 var error = new ErrorResponse(
                     400,
-                    "Page number must be greater than or equal to 1.",
-                    null
-                );
-                return StatusCode(error.StatusCode, error);
-            }
-            if (pageSize < 1)
-            {
-                var error = new ErrorResponse(
-                    400,
-                    "Page number must be greater than or equal to 1.",
+                    "Page number and size must be greater than 0.",
                     null
                 );
                 return StatusCode(error.StatusCode, error);
@@ -183,12 +157,14 @@ namespace UserService.Presentation.Controllers
 
             var result = await _service.Search(pageNumber, pageSize, tenantId, search);
             var size = await _service.CountSearchResults(search, tenantId);
+
             var response = new SuccessResponse<PaginatedResponseDTO<User>>(
                 200,
-                "",
+                "Search completed successfully.",
                 new PaginatedResponseDTO<User>(result.ToList(), size, pageNumber, pageSize)
             );
-            return StatusCode(response.StatusCode, response);
+
+            return Ok(response);
         }
     }
 }

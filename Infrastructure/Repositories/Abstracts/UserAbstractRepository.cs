@@ -6,7 +6,9 @@ using UserService.Utils;
 
 namespace UserService.Infrastructure.Repositories.Abstracts
 {
-    public abstract class UserAbstractRepository(DbContext dbContext) : Repository<User, Guid>(dbContext), IUserRepository
+    public abstract class UserAbstractRepository(DbContext dbContext)
+        : Repository<User, Guid>(dbContext),
+            IUserRepository
     {
         public async Task<int> Count(Guid tenantId)
         {
@@ -37,7 +39,7 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             {
                 UserId = user.Id,
                 RoleId = user.RoleId,
-                TenantId = user.TenantId
+                TenantId = user.TenantId,
             };
 
             return logIn;
@@ -49,7 +51,9 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             {
                 throw new ArgumentNullException(nameof(email));
             }
-            var entity = await _context.Set<User>().FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
+            var entity = await _context
+                .Set<User>()
+                .FirstOrDefaultAsync(e => e.Email == email && e.IsActive);
 
             if (entity == null)
             {
@@ -59,16 +63,27 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             return entity;
         }
 
-        public async Task<IEnumerable<User>> Search(int pageNumber, int pageSize, Guid tenantId, string search)
+        public async Task<IEnumerable<User>> Search(
+            int pageNumber,
+            int pageSize,
+            Guid tenantId,
+            string search
+        )
         {
             if (pageNumber < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than or equal to 1.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageNumber),
+                    "Page number must be greater than or equal to 1."
+                );
             }
 
             if (pageSize < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageSize),
+                    "Page size must be greater than or equal to 1."
+                );
             }
 
             var skip = (pageNumber - 1) * pageSize;
@@ -83,13 +98,12 @@ namespace UserService.Infrastructure.Repositories.Abstracts
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.ToLower();
-                query = query.Where(x => (x.LastNames + " " + x.FirstNames).ToLower().Contains(search));
+                query = query.Where(x =>
+                    (x.LastNames + " " + x.FirstNames).ToLower().Contains(search)
+                );
             }
 
-            var entities = await query
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync();
+            var entities = await query.Skip(skip).Take(pageSize).ToListAsync();
 
             return entities;
         }
@@ -105,14 +119,14 @@ namespace UserService.Infrastructure.Repositories.Abstracts
 
             if (tenantId != Guid.Empty)
             {
-                query = query.Where(user => user.TenantId == tenantId || user.TenantId == Guid.Empty);
+                query = query.Where(user =>
+                    user.TenantId == tenantId || user.TenantId == Guid.Empty
+                );
             }
 
             return await query
-                .Where(user =>
-                    (user.LastNames + " " + user.FirstNames).ToLower().Contains(search))
+                .Where(user => (user.LastNames + " " + user.FirstNames).ToLower().Contains(search))
                 .CountAsync();
         }
-
     }
 }

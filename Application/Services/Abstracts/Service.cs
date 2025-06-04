@@ -1,7 +1,6 @@
 using FluentValidation;
 using UserService.Application.Services.Interfaces;
 using UserService.Application.Validators.Interfaces;
-using UserService.Domain.DTOs.User;
 using UserService.Infrastructure.Repositories.Interfaces;
 
 namespace UserService.Application.Services.Abstracts
@@ -50,16 +49,6 @@ namespace UserService.Application.Services.Abstracts
                 throw new ArgumentNullException(nameof(id));
             }
             var entity = _repository.GetById(id, tenantId);
-            return entity;
-        }
-
-        public virtual Task<T?> GetByName(string name, Guid tenantId)
-        {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            var entity = _repository.GetByName(name, tenantId);
             return entity;
         }
 
