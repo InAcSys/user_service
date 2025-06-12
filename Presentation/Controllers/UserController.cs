@@ -166,5 +166,17 @@ namespace UserService.Presentation.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("role/{id}")]
+        public async Task<IActionResult> GetAllByRole([FromRoute] int id, [FromQuery] Guid tenantId)
+        {
+            var result = await _service.GetAllUsersByRole(tenantId, id);
+            var response = new SuccessResponse<AllResponseDTO<User>>(
+                200,
+                $"Users with role {id} obtained",
+                new Domain.DTOs.Responses.AllResponseDTO<User>(result.ToList())
+            );
+            return Ok(response);
+        }
     }
 }

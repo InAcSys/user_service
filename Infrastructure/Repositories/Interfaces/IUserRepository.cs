@@ -10,5 +10,6 @@ namespace UserService.Infrastructure.Repositories.Interfaces
         Task<UserLogInDTO> GetByCredentials(CredentialDTO credential);
         Task<IEnumerable<User>> Search(int pageNumber, int pageSize, Guid tenantId, string search);
         Task<int> CountSearchResults(string search, Guid tenantId);
+        Task<IEnumerable<User>> GetAllUsersByRole(Guid tenantId, int roleId);
     }
 }

@@ -128,5 +128,15 @@ namespace UserService.Infrastructure.Repositories.Abstracts
                 .Where(user => (user.LastNames + " " + user.FirstNames).ToLower().Contains(search))
                 .CountAsync();
         }
+
+        public async Task<IEnumerable<User>> GetAllUsersByRole(Guid tenantId, int roleId)
+        {
+            var users = await _context
+                .Set<User>()
+                .Where(user => user.TenantId == tenantId && user.RoleId == roleId && user.IsActive)
+                .ToListAsync();
+
+            return users;
+        }
     }
 }

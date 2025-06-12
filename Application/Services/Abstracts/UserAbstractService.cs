@@ -58,5 +58,10 @@ namespace UserService.Application.Services.Abstracts
         {
             return _userRepository.CountSearchResults(search, tenantId);
         }
+
+        public async Task<IEnumerable<User>> GetAllUsersByRole(Guid tenantId, int roleId)
+        {
+            return await _userRepository.GetAllUsersByRole(tenantId, roleId);
+        }
     }
 }
