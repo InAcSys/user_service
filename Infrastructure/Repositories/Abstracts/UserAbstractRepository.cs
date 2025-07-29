@@ -10,6 +10,48 @@ namespace UserService.Infrastructure.Repositories.Abstracts
         : Repository<User, Guid>(dbContext),
             IUserRepository
     {
+        public override async Task<User> Update(Guid id, User entity, Guid tenantId)
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentNullException(nameof(id));
+
+            var existingUser = await GetById(id, tenantId);
+            if (existingUser is null)
+                throw new InvalidOperationException("User not found.");
+
+            foreach (var property in typeof(User).GetProperties())
+            {
+                if (!property.CanRead || !property.CanWrite)
+                    continue;
+
+                if (
+                    property.Name == nameof(User.Id)
+                    || property.Name == nameof(User.Password)
+                    || property.Name == nameof(User.Salt)
+                    || property.Name == nameof(User.TenantId)
+                )
+                    continue;
+
+                var newValue = property.GetValue(entity);
+
+                if (newValue != null && !(newValue is string s && string.IsNullOrWhiteSpace(s)))
+                {
+                    property.SetValue(existingUser, newValue);
+                }
+            }
+
+            existingUser.Updated = DateTime.UtcNow;
+
+            if (existingUser.TenantId != Guid.Empty)
+            {
+                existingUser.TenantId = tenantId;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return existingUser;
+        }
+
         public async Task<int> Count(Guid tenantId)
         {
             var size = await _context

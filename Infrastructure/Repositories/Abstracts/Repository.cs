@@ -106,13 +106,25 @@ namespace UserService.Infrastructure.Repositories.Abstracts
                 keyProperty.SetValue(entity, keyProperty.GetValue(existingEntity));
             }
 
+            foreach (var property in typeof(T).GetProperties())
+            {
+                if (!property.CanWrite || !property.CanRead || property.Name == "Id")
+                    continue;
+
+                var newValue = property.GetValue(entity);
+                if (newValue != null && !(newValue is string s && string.IsNullOrWhiteSpace(s)))
+                {
+                    property.SetValue(existingEntity, newValue);
+                }
+            }
+
             existingEntity.Updated = DateTime.UtcNow;
+
             if (existingEntity.TenantId != Guid.Empty)
             {
                 existingEntity.TenantId = tenantId;
             }
 
-            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
 
             return existingEntity;
