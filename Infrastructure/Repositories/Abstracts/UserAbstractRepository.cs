@@ -10,6 +10,44 @@ namespace UserService.Infrastructure.Repositories.Abstracts
         : Repository<User, Guid>(dbContext),
             IUserRepository
     {
+        public override async Task<IEnumerable<User>> GetAll(
+            int pageNumber,
+            int pageSize,
+            Guid tenantId
+        )
+        {
+            if (pageNumber < 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageNumber),
+                    "Page number must be greater than or equal to 1."
+                );
+            }
+
+            if (pageSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageSize),
+                    "Page size must be greater than or equal to 1."
+                );
+            }
+
+            var skip = (pageNumber - 1) * pageSize;
+
+            var query = _context.Set<User>().Where(x => x.IsActive);
+
+            if (tenantId != Guid.Empty)
+            {
+                query = query
+                    .Where(x => x.TenantId == tenantId || x.TenantId == Guid.Empty)
+                    .OrderBy(x => x.LastNames);
+            }
+
+            var entities = await query.Skip(skip).Take(pageSize).ToListAsync();
+
+            return entities;
+        }
+
         public override async Task<User> Update(Guid id, User entity, Guid tenantId)
         {
             if (id == Guid.Empty)
